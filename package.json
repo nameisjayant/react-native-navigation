@@ -16,11 +16,8 @@
     "src",
     "lib",
     "android",
-    "ios",
     "cpp",
-    "*.podspec",
     "react-native.config.js",
-    "!ios/build",
     "!android/build",
     "!android/gradle",
     "!android/gradlew",
@@ -107,7 +104,7 @@
   },
   "codegenConfig": {
     "name": "ReactNativeNavigationSpec",
-    "type": "modules",
+    "type": "components",
     "jsSrcsDir": "src",
     "android": {
       "javaPackageName": "com.nameisjayant.reactnativenavigation"

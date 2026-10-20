@@ -3,29 +3,14 @@ package com.nameisjayant.reactnativenavigation
 import com.facebook.react.BaseReactPackage
 import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.module.model.ReactModuleInfo
 import com.facebook.react.module.model.ReactModuleInfoProvider
-import java.util.HashMap
+import com.facebook.react.uimanager.ViewManager
 
 class ReactNativeNavigationPackage : BaseReactPackage() {
-  override fun getModule(name: String, reactContext: ReactApplicationContext): NativeModule? {
-    return if (name == ReactNativeNavigationModule.NAME) {
-      ReactNativeNavigationModule(reactContext)
-    } else {
-      null
-    }
-  }
+  override fun getModule(name: String, reactContext: ReactApplicationContext): NativeModule? = null
 
-  override fun getReactModuleInfoProvider() = ReactModuleInfoProvider {
-    mapOf(
-      ReactNativeNavigationModule.NAME to ReactModuleInfo(
-        name = ReactNativeNavigationModule.NAME,
-        className = ReactNativeNavigationModule.NAME,
-        canOverrideExistingModule = false,
-        needsEagerInit = false,
-        isCxxModule = false,
-        isTurboModule = true
-      )
-    )
-  }
+  override fun getReactModuleInfoProvider() = ReactModuleInfoProvider { emptyMap() }
+
+  override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> =
+    listOf(NavigationContainerManager(), NavScreenManager())
 }

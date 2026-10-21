@@ -6,6 +6,11 @@ export type StackViewProps = {
   stack: Route[];
   exiting: Route[];
   renderScreen: (route: Route) => ReactNode;
+  /**
+   * Whether the native stack may handle back. False while the navigator is
+   * hidden or a nested navigator handles back instead.
+   */
+  backEnabled: boolean;
   onBack: () => void;
   onAttachedScreensChange: (keys: ReadonlyArray<string>) => void;
 };

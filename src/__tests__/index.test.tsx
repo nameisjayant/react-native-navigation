@@ -1,5 +1,10 @@
 import { describe, expect, it } from '@jest/globals';
-import { createRoute, stackReducer, type StackState } from '../stack';
+import {
+  createRoute,
+  nestedTarget,
+  stackReducer,
+  type StackState,
+} from '../stack';
 
 const initial = (): StackState => ({
   stack: [createRoute('Home')],
@@ -55,5 +60,23 @@ describe('stackReducer', () => {
     state = stackReducer(state, { type: 'popToTop' });
     expect(state.stack.map((r) => r.name)).toEqual(['Home']);
     expect(state.exiting.map((r) => r.name)).toEqual(['B', 'A', 'C']);
+  });
+});
+
+describe('nestedTarget', () => {
+  it('reads the nested screen and its params', () => {
+    expect(
+      nestedTarget({ screen: 'Search', params: { screen: 'Result' } })
+    ).toEqual({ screen: 'Search', params: { screen: 'Result' } });
+    expect(nestedTarget({ screen: 'Settings' })).toEqual({
+      screen: 'Settings',
+      params: undefined,
+    });
+  });
+
+  it('ignores params without a nested screen', () => {
+    expect(nestedTarget(undefined)).toBeUndefined();
+    expect(nestedTarget({ userId: '42' })).toBeUndefined();
+    expect(nestedTarget({ screen: 42 })).toBeUndefined();
   });
 });

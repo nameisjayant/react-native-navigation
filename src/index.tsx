@@ -8,6 +8,7 @@ export {
 export { useIsFocused, useNavigation, useRoute, useTabs } from './context';
 export type {
   Navigation,
+  NavigatorScreenParams,
   ParamListBase,
   Route,
   ScreenProps,

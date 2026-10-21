@@ -14,27 +14,53 @@ export type Route<
 };
 
 export type Navigation<ParamList extends ParamListBase = ParamListBase> = {
-  /** Push a new screen on top of the back stack. */
+  /**
+   * Push a new screen on top of the back stack. A name this navigator does not
+   * have is passed on to the parent navigator.
+   */
   navigate<Name extends keyof ParamList>(
     name: Name,
     ...params: undefined extends ParamList[Name]
       ? [params?: ParamList[Name]]
       : [params: ParamList[Name]]
   ): void;
-  /** Replace the current screen with a new one. */
+  /**
+   * Replace the current screen with a new one. A name this navigator does not
+   * have is passed on to the parent navigator.
+   */
   replace<Name extends keyof ParamList>(
     name: Name,
     ...params: undefined extends ParamList[Name]
       ? [params?: ParamList[Name]]
       : [params: ParamList[Name]]
   ): void;
-  /** Pop the current screen. No-op on the root screen. */
+  /**
+   * Pop the current screen. On the root screen of a nested navigator, goes
+   * back in the parent instead; no-op on the root screen of the top one.
+   */
   goBack(): void;
   /** Pop everything above the root screen. */
   popToTop(): void;
-  /** Whether there is a screen to go back to. */
+  /** Whether there is a screen to go back to, in this navigator or a parent. */
   canGoBack(): boolean;
+  /**
+   * The navigator this one is nested in, or undefined for the top one. A
+   * `<BottomTabs />` in between is skipped; reach it with `useTabs()`.
+   */
+  getParent<ParentParamList extends ParamListBase = ParamListBase>():
+    Navigation<ParentParamList> | undefined;
 };
+
+/**
+ * Params of a screen that renders a nested navigator, to open a given screen
+ * (or tab) of it, e.g. `navigate('Main', { screen: 'Search', params })`.
+ * Applies when the nested navigator is first rendered.
+ */
+export type NavigatorScreenParams<ParamList extends ParamListBase> = {
+  [Name in keyof ParamList]: undefined extends ParamList[Name]
+    ? { screen: Name; params?: ParamList[Name] }
+    : { screen: Name; params: ParamList[Name] };
+}[keyof ParamList];
 
 export type ScreenProps<
   ParamList extends ParamListBase = ParamListBase,

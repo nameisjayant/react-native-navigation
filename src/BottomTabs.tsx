@@ -21,9 +21,11 @@ import {
 import {
   BackInterceptorContext,
   IsFocusedContext,
+  NestedTargetContext,
   TabsContext,
   useIsFocused,
 } from './context';
+import { nestedTarget } from './stack';
 import type {
   TabBarProps,
   TabConfig,
@@ -71,10 +73,17 @@ export function BottomTabs<TabName extends string>({
     }
     return name;
   });
-  const [activeTab, setActiveTab] = useState(homeTab);
+  // `navigate('Parent', { screen: 'SomeTab', params })` opens that tab first.
+  const target = useContext(NestedTargetContext);
+  const [initialTarget] = useState(() =>
+    target != null && target.screen in tabs ? target : undefined
+  );
+  const [activeTab, setActiveTab] = useState(
+    () => (initialTarget?.screen as TabName | undefined) ?? homeTab
+  );
   // Tabs mount on first visit and stay mounted to keep their state.
   const [visited, setVisited] = useState<ReadonlySet<TabName>>(
-    () => new Set([homeTab])
+    () => new Set([activeTab])
   );
 
   const tabsRef = useRef(tabs);
@@ -149,7 +158,16 @@ export function BottomTabs<TabName extends string>({
                   <IsFocusedContext.Provider
                     value={isFocused && name === activeTab}
                   >
-                    <Screen tabs={navigation} />
+                    {/* The target's params pick the screen of a navigator nested in the tab. */}
+                    <NestedTargetContext.Provider
+                      value={
+                        name === initialTarget?.screen
+                          ? nestedTarget(initialTarget.params)
+                          : undefined
+                      }
+                    >
+                      <Screen tabs={navigation} />
+                    </NestedTargetContext.Provider>
                   </IsFocusedContext.Provider>
                 </View>
               );

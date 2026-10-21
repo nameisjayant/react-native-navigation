@@ -1,10 +1,26 @@
 import { createContext, useContext } from 'react';
+import type { NestedTarget } from './stack';
 import type { Navigation, ParamListBase, Route, TabNavigation } from './types';
 
 export const NavigationContext = createContext<Navigation | null>(null);
 export const RouteContext = createContext<Route | null>(null);
 export const IsFocusedContext = createContext(true);
 export const TabsContext = createContext<TabNavigation | null>(null);
+
+/**
+ * The screen a nested navigator should open first, taken from the params of
+ * the screen it is rendered in, e.g. `navigate('Main', { screen: 'Search' })`.
+ */
+export const NestedTargetContext = createContext<NestedTarget | undefined>(
+  undefined
+);
+
+/**
+ * Lets a nested navigator tell its parent whether it handles back itself
+ * right now, so the parent stops handling back natively meanwhile.
+ */
+export type SetChildHandlesBack = (child: object, handles: boolean) => void;
+export const ChildBackContext = createContext<SetChildHandlesBack | null>(null);
 
 /**
  * Registers a handler that runs on back before the navigator pops. Returning

@@ -12,6 +12,7 @@ export function StackView({
   stack,
   exiting,
   renderScreen,
+  backEnabled,
   onBack,
   onAttachedScreensChange,
 }: StackViewProps) {
@@ -19,6 +20,7 @@ export function StackView({
     <NavigationContainerNativeComponent
       style={styles.container}
       stack={stack.map((route) => route.key)}
+      backEnabled={backEnabled}
       onBack={onBack}
       onAttachedScreensChange={(event) =>
         onAttachedScreensChange(event.nativeEvent.keys)

@@ -8,9 +8,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -20,6 +23,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigationevent.NavigationEventDispatcherOwner
 import androidx.navigationevent.compose.LocalNavigationEventDispatcherOwner
+import androidx.navigationevent.compose.rememberNavigationEventDispatcherOwner
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.uimanager.ThemedReactContext
@@ -42,6 +46,9 @@ class NavigationContainerView(private val reactContext: ThemedReactContext) :
 
   /** Keys of entries currently composed (visible or animating), ref counted. */
   private val attached = mutableStateMapOf<String, Int>()
+
+  /** False while JS wants back left to a nested container (or none). */
+  var backEnabled by mutableStateOf(true)
 
   init {
     val composeView = ComposeView(reactContext).apply {
@@ -82,8 +89,11 @@ class NavigationContainerView(private val reactContext: ThemedReactContext) :
     if (backStack.isEmpty()) return
 
     // A bare ComposeView does not provide a back event dispatcher, which
-    // NavDisplay requires; use the host activity's.
-    val dispatcherOwner = reactContext.currentActivity as? NavigationEventDispatcherOwner ?: return
+    // NavDisplay requires; use a child of the host activity's. Each container,
+    // nested ones included, gets its own so JS can switch it off on its own.
+    val activityOwner = reactContext.currentActivity as? NavigationEventDispatcherOwner ?: return
+    val dispatcherOwner =
+      rememberNavigationEventDispatcherOwner(enabled = backEnabled, parent = activityOwner)
 
     CompositionLocalProvider(LocalNavigationEventDispatcherOwner provides dispatcherOwner) {
       NavDisplay(
@@ -141,6 +151,7 @@ class NavigationContainerView(private val reactContext: ThemedReactContext) :
   // measure and lay out the Compose hierarchy ourselves when it asks for it.
 
   private val measureAndLayout = Runnable {
+    if (!isAttachedToWindow) return@Runnable
     measure(
       MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
       MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY),
@@ -153,6 +164,12 @@ class NavigationContainerView(private val reactContext: ThemedReactContext) :
     post(measureAndLayout)
   }
 
+  // Lay out what was skipped in onMeasure while detached.
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    post(measureAndLayout)
+  }
+
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     for (i in 0 until childCount) {
       getChildAt(i).layout(0, 0, r - l, b - t)
@@ -162,13 +179,17 @@ class NavigationContainerView(private val reactContext: ThemedReactContext) :
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     val width = MeasureSpec.getSize(widthMeasureSpec)
     val height = MeasureSpec.getSize(heightMeasureSpec)
+    setMeasuredDimension(width, height)
+    // Measuring a detached ComposeView makes it create its composition, which
+    // needs a window. Fabric measures every view it lays out, including a
+    // nested container whose screen is not yet placed in a NavEntry.
+    if (!isAttachedToWindow) return
     for (i in 0 until childCount) {
       getChildAt(i).measure(
         MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
         MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY),
       )
     }
-    setMeasuredDimension(width, height)
   }
 
   private fun View.detach() {

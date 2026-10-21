@@ -17,6 +17,24 @@ export type StackAction =
   | { type: 'popToTop' }
   | { type: 'attachedScreensChange'; keys: ReadonlyArray<string> };
 
+export type NestedTarget = { screen: string; params?: object };
+
+/** Reads `{ screen, params }` from a route's params, if present. */
+export function nestedTarget(params?: object): NestedTarget | undefined {
+  if (
+    params == null ||
+    !('screen' in params) ||
+    typeof params.screen !== 'string'
+  ) {
+    return undefined;
+  }
+  return {
+    screen: params.screen,
+    params:
+      'params' in params ? (params.params as object | undefined) : undefined,
+  };
+}
+
 let nextKey = 0;
 
 export function createRoute(name: string, params?: object): Route {

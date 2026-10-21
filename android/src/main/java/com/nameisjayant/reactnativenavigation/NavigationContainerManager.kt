@@ -27,6 +27,10 @@ class NavigationContainerManager :
     view.setStack(keys)
   }
 
+  override fun setBackEnabled(view: NavigationContainerView, value: Boolean) {
+    view.backEnabled = value
+  }
+
   // Children are screens, laid out by Compose instead of React Native.
 
   override fun needsCustomLayoutForChildren(): Boolean = true

@@ -12,6 +12,7 @@ import {
   BottomTabs,
   useNavigation,
   useTabs,
+  type NavigatorScreenParams,
   type ScreenProps,
   type TabBarProps,
   type TabScreenProps,
@@ -20,11 +21,23 @@ import { svgIcon } from './icons';
 
 type RootParamList = {
   Welcome: undefined;
-  Main: undefined;
+  Main: NavigatorScreenParams<TabParamList> | undefined;
   Profile: { userId: string; name: string };
 };
 
-type TabName = 'Home' | 'Search' | 'Settings';
+type TabParamList = {
+  Home: undefined;
+  Search: NavigatorScreenParams<SearchParamList> | undefined;
+  Settings: undefined;
+};
+
+type TabName = keyof TabParamList;
+
+// The Search tab has its own stack, nested inside the tab.
+type SearchParamList = {
+  SearchList: undefined;
+  SearchResult: { query: string };
+};
 
 // Lets the Settings tab switch between the default and the custom tab bar.
 const CustomBarContext = createContext({
@@ -38,6 +51,20 @@ function Welcome({ navigation }: ScreenProps<RootParamList, 'Welcome'>) {
       <Text style={styles.title}>Welcome</Text>
       <Text>The first screen, shown before the tabs.</Text>
       <Button title="Get started" onPress={() => navigation.navigate('Main')} />
+      {/* Open a given tab, and a screen of the stack nested in it. */}
+      <Button
+        title="Open settings tab"
+        onPress={() => navigation.navigate('Main', { screen: 'Settings' })}
+      />
+      <Button
+        title="Open a search result"
+        onPress={() =>
+          navigation.navigate('Main', {
+            screen: 'Search',
+            params: { screen: 'SearchResult', params: { query: 'deep link' } },
+          })
+        }
+      />
     </View>
   );
 }
@@ -59,7 +86,15 @@ function Home({ tabs }: TabScreenProps<TabName>) {
   );
 }
 
-function Search() {
+function SearchTab() {
+  return (
+    <AppNavigation<SearchParamList> screens={{ SearchList, SearchResult }} />
+  );
+}
+
+function SearchList({
+  navigation,
+}: ScreenProps<SearchParamList, 'SearchList'>) {
   const [count, setCount] = useState(0);
   return (
     <View style={styles.screen}>
@@ -69,6 +104,40 @@ function Search() {
         title={`Pressed ${count} times`}
         onPress={() => setCount(count + 1)}
       />
+      {/* Pushes inside the tab, keeping the tab bar visible. */}
+      <Button
+        title="Search for react"
+        onPress={() => navigation.navigate('SearchResult', { query: 'react' })}
+      />
+    </View>
+  );
+}
+
+function SearchResult({
+  navigation,
+  route,
+}: ScreenProps<SearchParamList, 'SearchResult'>) {
+  return (
+    <View style={styles.screen}>
+      <Text style={styles.title}>Results for "{route.params.query}"</Text>
+      <Button
+        title="Refine search"
+        onPress={() =>
+          navigation.navigate('SearchResult', {
+            query: `${route.params.query}!`,
+          })
+        }
+      />
+      {/* Screens of the root stack are reached through the parent. */}
+      <Button
+        title="Open profile"
+        onPress={() =>
+          navigation
+            .getParent<RootParamList>()
+            ?.navigate('Profile', { userId: '7', name: 'jayant' })
+        }
+      />
+      <Button title="Go back" onPress={() => navigation.goBack()} />
     </View>
   );
 }
@@ -155,7 +224,7 @@ function MainTabs() {
           icon: svgIcon('homeOutlined'),
           focusedIcon: svgIcon('home'),
         },
-        Search: { screen: Search, icon: svgIcon('search') },
+        Search: { screen: SearchTab, icon: svgIcon('search') },
         Settings: { screen: Settings, icon: svgIcon('settings') },
       }}
       tabBar={enabled ? PillTabBar : undefined}

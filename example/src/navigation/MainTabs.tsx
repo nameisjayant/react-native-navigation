@@ -7,6 +7,7 @@ import { SettingsScreen } from '../screens/Settings';
 import { colors } from '../theme';
 import { FloatingTabBar } from './FloatingTabBar';
 import { SearchNavigator } from './SearchNavigator';
+import { TabRoutes } from './routes';
 import type { TabName } from './types';
 
 export function MainTabs() {
@@ -14,21 +15,24 @@ export function MainTabs() {
   return (
     <View style={styles.container}>
       <BottomTabs<TabName>
-        initialTab="Home"
+        initialTab={TabRoutes.Home}
         tabs={{
           // Outlined icon normally, filled while the tab is active.
-          Home: {
+          [TabRoutes.Home]: {
             screen: HomeScreen,
             icon: tabIcon('homeOutlined'),
             focusedIcon: tabIcon('home'),
           },
-          Search: {
+          [TabRoutes.Search]: {
             screen: SearchNavigator,
             label: 'Explore',
             icon: tabIcon('search'),
             focusedIcon: tabIcon('explore'),
           },
-          Settings: { screen: SettingsScreen, icon: tabIcon('settings') },
+          [TabRoutes.Settings]: {
+            screen: SettingsScreen,
+            icon: tabIcon('settings'),
+          },
         }}
         backBehavior={backToHomeTab ? 'initialTab' : 'none'}
         // Default tab bar, styled through props…

@@ -10,6 +10,7 @@ import {
   Screen,
   SectionHeader,
 } from '../../components';
+import { Routes } from '../../navigation/routes';
 import type { RootParamList, RootScreenProps } from '../../navigation/types';
 import { colors, typography } from '../../theme';
 import { styles } from './styles';
@@ -58,7 +59,7 @@ export function StackLabScreen({ navigation }: RootScreenProps<'StackLab'>) {
             label="Push"
             icon="add"
             onPress={() =>
-              navigation.navigate('StackLab', { depth: depth + 1 })
+              navigation.navigate(Routes.StackLab, { depth: depth + 1 })
             }
           />
         </Action>
@@ -70,7 +71,7 @@ export function StackLabScreen({ navigation }: RootScreenProps<'StackLab'>) {
             label="Replace"
             icon="swap"
             variant="secondary"
-            onPress={() => navigation.replace('StackLab', { depth })}
+            onPress={() => navigation.replace(Routes.StackLab, { depth })}
           />
         </Action>
         <Action api="goBack()" description="Pop this screen.">

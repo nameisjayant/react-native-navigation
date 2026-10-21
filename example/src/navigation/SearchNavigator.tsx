@@ -1,6 +1,7 @@
 import { AppNavigation } from '@nameisjayant/react-native-navigation';
 import { SearchListScreen } from '../screens/SearchList';
 import { SearchResultScreen } from '../screens/SearchResult';
+import { SearchRoutes } from './routes';
 import type { SearchParamList } from './types';
 
 /**
@@ -11,8 +12,8 @@ export function SearchNavigator() {
   return (
     <AppNavigation<SearchParamList>
       screens={{
-        SearchList: SearchListScreen,
-        SearchResult: SearchResultScreen,
+        [SearchRoutes.SearchList]: SearchListScreen,
+        [SearchRoutes.SearchResult]: SearchResultScreen,
       }}
     />
   );

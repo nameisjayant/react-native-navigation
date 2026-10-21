@@ -12,6 +12,7 @@ import {
 } from '../../components';
 import { trendingTopics } from '../../data/topics';
 import { Icon } from '../../icons';
+import { SearchRoutes } from '../../navigation/routes';
 import type { SearchScreenProps } from '../../navigation/types';
 import { colors, typography } from '../../theme';
 import { styles } from './styles';
@@ -32,7 +33,7 @@ export function SearchListScreen({
       [trimmed, ...prev.filter((item) => item !== trimmed)].slice(0, 4)
     );
     // Pushes inside the tab, keeping the tab bar visible.
-    navigation.navigate('SearchResult', { query: trimmed });
+    navigation.navigate(SearchRoutes.SearchResult, { query: trimmed });
   };
 
   return (

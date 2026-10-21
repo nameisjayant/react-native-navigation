@@ -13,6 +13,7 @@ import {
 import { people } from '../../data/people';
 import { resultsFor } from '../../data/topics';
 import { Icon } from '../../icons';
+import { Routes, SearchRoutes } from '../../navigation/routes';
 import type { RootParamList, SearchScreenProps } from '../../navigation/types';
 import { colors, typography } from '../../theme';
 import { styles } from './styles';
@@ -52,7 +53,7 @@ export function SearchResultScreen({
             subtitle={result.summary}
             // Drill down: push another result on the nested stack.
             onPress={() =>
-              navigation.navigate('SearchResult', {
+              navigation.navigate(SearchRoutes.SearchResult, {
                 query: result.title.toLowerCase(),
               })
             }
@@ -75,7 +76,7 @@ export function SearchResultScreen({
             onPress={() =>
               navigation
                 .getParent<RootParamList>()
-                ?.navigate('Profile', { userId: person.id })
+                ?.navigate(Routes.Profile, { userId: person.id })
             }
             last={index === authors.length - 1}
           />

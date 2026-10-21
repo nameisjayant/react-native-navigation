@@ -9,6 +9,7 @@ import {
   SectionHeader,
 } from '../../components';
 import { Icon } from '../../icons';
+import { Routes, SearchRoutes, TabRoutes } from '../../navigation/routes';
 import type { RootScreenProps } from '../../navigation/types';
 import { colors, typography } from '../../theme';
 import { styles } from './styles';
@@ -45,7 +46,9 @@ export function WelcomeScreen({ navigation }: RootScreenProps<'Welcome'>) {
           leading={<IconBadge name="settings" tone="amber" />}
           title="Open the Settings tab"
           subtitle="navigate('Main', { screen: 'Settings' })"
-          onPress={() => navigation.navigate('Main', { screen: 'Settings' })}
+          onPress={() =>
+            navigation.navigate(Routes.Main, { screen: TabRoutes.Settings })
+          }
         />
         {/* Two levels deep: a tab, then a screen of the stack inside it. */}
         <ListRow
@@ -53,10 +56,10 @@ export function WelcomeScreen({ navigation }: RootScreenProps<'Welcome'>) {
           title="Deep link to a search result"
           subtitle="Main → Explore tab → SearchResult"
           onPress={() =>
-            navigation.navigate('Main', {
-              screen: 'Search',
+            navigation.navigate(Routes.Main, {
+              screen: TabRoutes.Search,
               params: {
-                screen: 'SearchResult',
+                screen: SearchRoutes.SearchResult,
                 params: { query: 'deep links' },
               },
             })
@@ -66,7 +69,7 @@ export function WelcomeScreen({ navigation }: RootScreenProps<'Welcome'>) {
           leading={<IconBadge name="layers" tone="violet" />}
           title="Open the Stack Lab"
           subtitle="Push, replace and pop, live"
-          onPress={() => navigation.navigate('StackLab', { depth: 1 })}
+          onPress={() => navigation.navigate(Routes.StackLab, { depth: 1 })}
           last
         />
       </Card>
@@ -75,7 +78,7 @@ export function WelcomeScreen({ navigation }: RootScreenProps<'Welcome'>) {
         <Button
           label="Get started"
           icon="arrowForward"
-          onPress={() => navigation.navigate('Main')}
+          onPress={() => navigation.navigate(Routes.Main)}
         />
         <View style={styles.footerNote}>
           <Text style={typography.caption}>Pushes the tabs with</Text>

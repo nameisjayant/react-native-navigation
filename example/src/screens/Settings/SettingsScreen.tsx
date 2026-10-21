@@ -14,6 +14,7 @@ import {
   type TabBarVariant,
 } from '../../context/PreferencesContext';
 import { Icon } from '../../icons';
+import { Routes, TabRoutes } from '../../navigation/routes';
 import type { RootParamList, TabName } from '../../navigation/types';
 import { accents, colors, typography } from '../../theme';
 import { styles } from './styles';
@@ -140,19 +141,19 @@ function SettingsShortcuts() {
         leading={<IconBadge name="home" tone="indigo" />}
         title="Back to Home"
         subtitle="useTabs().jumpTo('Home')"
-        onPress={() => tabs.jumpTo('Home')}
+        onPress={() => tabs.jumpTo(TabRoutes.Home)}
       />
       <ListRow
         leading={<IconBadge name="layers" tone="violet" />}
         title="Open the Stack Lab"
         subtitle="Pushed over the tabs"
-        onPress={() => navigation.navigate('StackLab', { depth: 1 })}
+        onPress={() => navigation.navigate(Routes.StackLab, { depth: 1 })}
       />
       <ListRow
         leading={<IconBadge name="logout" tone="rose" />}
         title="Sign out"
         subtitle="replace('Welcome'): the tabs are gone from history"
-        onPress={() => navigation.replace('Welcome')}
+        onPress={() => navigation.replace(Routes.Welcome)}
         last
       />
     </Card>

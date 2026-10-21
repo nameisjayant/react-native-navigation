@@ -3,17 +3,18 @@ import { ProfileScreen } from '../screens/Profile';
 import { StackLabScreen } from '../screens/StackLab';
 import { WelcomeScreen } from '../screens/Welcome';
 import { MainTabs } from './MainTabs';
+import { Routes } from './routes';
 import type { RootParamList } from './types';
 
 export function RootNavigator() {
   return (
     <AppNavigation<RootParamList>
-      initialRoute="Welcome"
+      initialRoute={Routes.Welcome}
       screens={{
-        Welcome: WelcomeScreen,
-        Main: MainTabs,
-        Profile: ProfileScreen,
-        StackLab: StackLabScreen,
+        [Routes.Welcome]: WelcomeScreen,
+        [Routes.Main]: MainTabs,
+        [Routes.Profile]: ProfileScreen,
+        [Routes.StackLab]: StackLabScreen,
       }}
     />
   );

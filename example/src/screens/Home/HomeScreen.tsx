@@ -15,6 +15,7 @@ import {
 } from '../../components';
 import { people } from '../../data/people';
 import { Icon } from '../../icons';
+import { Routes, TabRoutes } from '../../navigation/routes';
 import type { RootParamList, TabName } from '../../navigation/types';
 import { colors } from '../../theme';
 import { styles } from './styles';
@@ -41,7 +42,7 @@ export function HomeScreen({ tabs }: TabScreenProps<TabName>) {
           title="Stack"
           description="Push a profile with typed params, covering the tabs."
           api="navigate('Profile')"
-          onPress={() => navigation.navigate('Profile', { userId: '42' })}
+          onPress={() => navigation.navigate(Routes.Profile, { userId: '42' })}
         />
         <FeatureCard
           icon="layers"
@@ -49,7 +50,7 @@ export function HomeScreen({ tabs }: TabScreenProps<TabName>) {
           title="Stack Lab"
           description="Push, replace, go back and pop to top."
           api="replace()"
-          onPress={() => navigation.navigate('StackLab', { depth: 1 })}
+          onPress={() => navigation.navigate(Routes.StackLab, { depth: 1 })}
         />
         <FeatureCard
           icon="explore"
@@ -57,7 +58,7 @@ export function HomeScreen({ tabs }: TabScreenProps<TabName>) {
           title="Nested stack"
           description="A whole stack living inside the Explore tab."
           api="tabs.jumpTo()"
-          onPress={() => tabs.jumpTo('Search')}
+          onPress={() => tabs.jumpTo(TabRoutes.Search)}
         />
         <FeatureCard
           icon="palette"
@@ -65,7 +66,7 @@ export function HomeScreen({ tabs }: TabScreenProps<TabName>) {
           title="Tab bar"
           description="Restyle the tab bar or swap in your own."
           api="tabBar={…}"
-          onPress={() => tabs.jumpTo('Settings')}
+          onPress={() => tabs.jumpTo(TabRoutes.Settings)}
         />
       </View>
 
@@ -79,7 +80,10 @@ export function HomeScreen({ tabs }: TabScreenProps<TabName>) {
 
       <SectionHeader
         title="People"
-        action={{ label: 'Explore', onPress: () => tabs.jumpTo('Search') }}
+        action={{
+          label: 'Explore',
+          onPress: () => tabs.jumpTo(TabRoutes.Search),
+        }}
       />
       <Card flush>
         {people.slice(0, 4).map((person, index, list) => (
@@ -89,7 +93,7 @@ export function HomeScreen({ tabs }: TabScreenProps<TabName>) {
             title={person.name}
             subtitle={person.role}
             onPress={() =>
-              navigation.navigate('Profile', { userId: person.id })
+              navigation.navigate(Routes.Profile, { userId: person.id })
             }
             last={index === list.length - 1}
           />

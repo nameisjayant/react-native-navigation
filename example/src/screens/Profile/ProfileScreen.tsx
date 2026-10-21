@@ -11,6 +11,7 @@ import {
   SectionHeader,
 } from '../../components';
 import { findPerson, people } from '../../data/people';
+import { Routes } from '../../navigation/routes';
 import type { RootParamList, RootScreenProps } from '../../navigation/types';
 import { tones, typography } from '../../theme';
 import { styles } from './styles';
@@ -81,7 +82,7 @@ function ProfileLink({ userId, last }: { userId: string; last: boolean }) {
       leading={<Avatar name={person.name} tone={person.tone} size={40} />}
       title={person.name}
       subtitle="Pushes another Profile on the stack"
-      onPress={() => navigation.navigate('Profile', { userId })}
+      onPress={() => navigation.navigate(Routes.Profile, { userId })}
       last={last}
     />
   );

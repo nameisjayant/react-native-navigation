@@ -12,12 +12,13 @@ export type StackViewProps = {
    */
   backEnabled: boolean;
   onBack: () => void;
+  /** iOS: the user popped the screen with `key` natively. */
+  onPop: (key: string) => void;
   onAttachedScreensChange: (keys: ReadonlyArray<string>) => void;
 };
 
 /**
- * Fallback for platforms without the native Navigation 3 implementation
- * (iOS, web): keeps every screen mounted and shows only the top one.
+ * Fallback for platforms without a native implementation (web): keeps every screen mounted and shows only the top one.
  */
 export function StackView({ stack, renderScreen }: StackViewProps) {
   return (

@@ -8,6 +8,10 @@ export type AttachedScreensChangeEvent = Readonly<{
   keys: string[];
 }>;
 
+export type PopEvent = Readonly<{
+  key: string;
+}>;
+
 export interface NativeProps extends ViewProps {
   /** Ordered list of screen keys; the last one is the visible screen. */
   stack: ReadonlyArray<string>;
@@ -23,6 +27,11 @@ export interface NativeProps extends ViewProps {
    * changes (e.g. after an exit animation finishes).
    */
   onAttachedScreensChange?: CodegenTypes.DirectEventHandler<AttachedScreensChangeEvent>;
+  /**
+   * iOS: fired when the user popped `key` natively (swipe back). The native
+   * stack has already popped it.
+   */
+  onPop?: CodegenTypes.DirectEventHandler<PopEvent>;
 }
 
 export default codegenNativeComponent<NativeProps>('RNNavigationContainer');

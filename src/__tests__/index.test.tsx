@@ -46,6 +46,18 @@ describe('stackReducer', () => {
     expect(state.exiting).toEqual([]);
   });
 
+  it('ignores a native pop of a screen that is not on top', () => {
+    let state = stackReducer(initial(), { type: 'push', name: 'A' });
+    const a = state.stack[1]!;
+    state = stackReducer(state, { type: 'push', name: 'B' });
+
+    expect(stackReducer(state, { type: 'pop', key: a.key })).toBe(state);
+
+    const b = state.stack[2]!;
+    state = stackReducer(state, { type: 'pop', key: b.key });
+    expect(state.stack.map((r) => r.name)).toEqual(['Home', 'A']);
+  });
+
   it('does not pop the root route', () => {
     const state = initial();
     expect(stackReducer(state, { type: 'pop' })).toBe(state);

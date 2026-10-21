@@ -242,6 +242,7 @@ export function AppNavigation<ParamList extends ParamListBase>({
             renderScreen={renderScreen}
             backEnabled={parentFocused && !childHandlesBack}
             onBack={handleBack}
+            onPop={(key) => dispatch({ type: 'pop', key })}
             onAttachedScreensChange={(keys) =>
               dispatch({ type: 'attachedScreensChange', keys })
             }

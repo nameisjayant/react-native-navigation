@@ -16,6 +16,8 @@
     "src",
     "lib",
     "android",
+    "ios",
+    "*.podspec",
     "cpp",
     "react-native.config.js",
     "!android/build",
@@ -108,6 +110,12 @@
     "jsSrcsDir": "src",
     "android": {
       "javaPackageName": "com.nameisjayant.reactnativenavigation"
+    },
+    "ios": {
+      "componentProvider": {
+        "RNNavigationContainer": "RNNavigationContainerComponentView",
+        "RNNavScreen": "RNNavScreenComponentView"
+      }
     }
   },
   "prettier": {

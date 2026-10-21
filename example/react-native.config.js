@@ -11,8 +11,7 @@ module.exports = {
     [pkg.name]: {
       root: path.join(__dirname, '..'),
       platforms: {
-        // The library only has a native implementation for Android
-        ios: null,
+        ios: {},
         android: {},
       },
     },

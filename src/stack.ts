@@ -13,7 +13,7 @@ export type StackState = {
 export type StackAction =
   | { type: 'push'; name: string; params?: object }
   | { type: 'replace'; name: string; params?: object }
-  | { type: 'pop' }
+  | { type: 'pop'; key?: string }
   | { type: 'popToTop' }
   | { type: 'attachedScreensChange'; keys: ReadonlyArray<string> };
 
@@ -62,7 +62,11 @@ export function stackReducer(
         createRoute(action.name, action.params),
       ]);
     case 'pop':
-      if (state.stack.length <= 1) {
+      if (
+        state.stack.length <= 1 ||
+        // Popped natively: ignore if that screen is no longer on top.
+        (action.key != null && state.stack.at(-1)?.key !== action.key)
+      ) {
         return state;
       }
       return removeTo(state, state.stack.slice(0, -1));

@@ -1,9 +1,23 @@
 export { AppNavigation, type AppNavigationProps } from './AppNavigation';
-export { useNavigation, useRoute } from './context';
+export {
+  BottomTabs,
+  TabBar,
+  type BottomTabsProps,
+  type TabBarViewProps,
+} from './BottomTabs';
+export { useIsFocused, useNavigation, useRoute, useTabs } from './context';
 export type {
   Navigation,
   ParamListBase,
   Route,
   ScreenProps,
   Screens,
+  TabBarItem,
+  TabBarProps,
+  TabConfig,
+  TabIcon,
+  TabIconProps,
+  TabNavigation,
+  Tabs,
+  TabScreenProps,
 } from './types';

@@ -1,4 +1,5 @@
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
+import type { ImageSourcePropType } from 'react-native';
 
 export type ParamListBase = Record<string, object | undefined>;
 
@@ -45,4 +46,66 @@ export type ScreenProps<
 
 export type Screens<ParamList extends ParamListBase = ParamListBase> = {
   [Name in keyof ParamList]: ComponentType<ScreenProps<ParamList, Name>>;
+};
+
+export type TabNavigation<TabName extends string = string> = {
+  /** Name of the visible tab. */
+  activeTab: TabName;
+  /** Switch to another tab. */
+  jumpTo(name: TabName): void;
+};
+
+export type TabScreenProps<TabName extends string = string> = {
+  tabs: TabNavigation<TabName>;
+};
+
+export type TabIconProps = {
+  focused: boolean;
+  color: string;
+  size: number;
+};
+
+/**
+ * A tab icon, either:
+ * - a render function, for SVG components, icon fonts or anything else:
+ *   `({ color, size }) => <HomeSvg width={size} height={size} color={color} />`
+ *   `({ color, size }) => <MaterialIcons name="home" color={color} size={size} />`
+ *   It is called during render, so it must not use hooks.
+ * - an image source, e.g. `require('./home.png')` or `{ uri: '...' }`. It is
+ *   tinted with the tab color; for a full-color image use a render function
+ *   returning an `<Image />`.
+ */
+export type TabIcon =
+  ((props: TabIconProps) => ReactNode) | ImageSourcePropType;
+
+export type TabConfig<TabName extends string = string> = {
+  screen: ComponentType<TabScreenProps<TabName>>;
+  /** Text shown in the tab bar. Defaults to the tab name. */
+  label?: string;
+  /** Icon of the tab. Also used when focused unless `focusedIcon` is set. */
+  icon?: TabIcon;
+  /** Icon shown while the tab is active, e.g. a filled variant. */
+  focusedIcon?: TabIcon;
+};
+
+export type Tabs<TabName extends string = string> = {
+  [Name in TabName]: TabConfig<TabName>;
+};
+
+export type TabBarItem<TabName extends string = string> = {
+  name: TabName;
+  label: string;
+  focused: boolean;
+  /**
+   * Renders the tab's icon (or `focusedIcon` when `focused` is true), whatever
+   * form it was given in. Undefined when the tab has no icon.
+   */
+  icon?: (props: TabIconProps) => ReactNode;
+};
+
+/** Props passed to a custom `tabBar`. */
+export type TabBarProps<TabName extends string = string> = {
+  items: TabBarItem<TabName>[];
+  activeTab: TabName;
+  jumpTo(name: TabName): void;
 };

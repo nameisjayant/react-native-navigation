@@ -1,25 +1,96 @@
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { createContext, useContext, useState } from 'react';
+import {
+  Button,
+  Pressable,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+} from 'react-native';
 import {
   AppNavigation,
+  BottomTabs,
   useNavigation,
+  useTabs,
   type ScreenProps,
+  type TabBarProps,
+  type TabScreenProps,
 } from '@nameisjayant/react-native-navigation';
+import { svgIcon } from './icons';
 
 type RootParamList = {
-  Home: undefined;
-  Profile: { userId: string };
+  Welcome: undefined;
+  Main: undefined;
+  Profile: { userId: string; name: string };
 };
 
-function Home({ navigation }: ScreenProps<RootParamList, 'Home'>) {
+type TabName = 'Home' | 'Search' | 'Settings';
+
+// Lets the Settings tab switch between the default and the custom tab bar.
+const CustomBarContext = createContext({
+  enabled: false,
+  setEnabled: (_enabled: boolean) => {},
+});
+
+function Welcome({ navigation }: ScreenProps<RootParamList, 'Welcome'>) {
+  return (
+    <View style={styles.screen}>
+      <Text style={styles.title}>Welcome</Text>
+      <Text>The first screen, shown before the tabs.</Text>
+      <Button title="Get started" onPress={() => navigation.navigate('Main')} />
+    </View>
+  );
+}
+
+function Home({ tabs }: TabScreenProps<TabName>) {
+  // Tab screens push onto the root stack, covering the tab bar.
+  const navigation = useNavigation<RootParamList>();
   return (
     <View style={styles.screen}>
       <Text style={styles.title}>Home</Text>
       <Button
         title="Open profile"
-        onPress={() => navigation.navigate('Profile', { userId: '42' })}
+        onPress={() =>
+          navigation.navigate('Profile', { userId: '42', name: 'jayant' })
+        }
+      />
+      <Button title="Go to search" onPress={() => tabs.jumpTo('Search')} />
+    </View>
+  );
+}
+
+function Search() {
+  const [count, setCount] = useState(0);
+  return (
+    <View style={styles.screen}>
+      <Text style={styles.title}>Search</Text>
+      <Text>Tab state is kept when switching tabs.</Text>
+      <Button
+        title={`Pressed ${count} times`}
+        onPress={() => setCount(count + 1)}
       />
     </View>
   );
+}
+
+function Settings() {
+  const { enabled, setEnabled } = useContext(CustomBarContext);
+  return (
+    <View style={styles.screen}>
+      <Text style={styles.title}>Settings</Text>
+      <View style={styles.row}>
+        <Text>Use custom tab bar</Text>
+        <Switch value={enabled} onValueChange={setEnabled} />
+      </View>
+      <SettingsFooter />
+    </View>
+  );
+}
+
+// Any nested component can reach the tabs through the hook.
+function SettingsFooter() {
+  const tabs = useTabs<TabName>();
+  return <Button title="Back to home" onPress={() => tabs.jumpTo('Home')} />;
 }
 
 function Profile({ route }: ScreenProps<RootParamList, 'Profile'>) {
@@ -31,7 +102,6 @@ function Profile({ route }: ScreenProps<RootParamList, 'Profile'>) {
   );
 }
 
-// Any nested component can reach the navigator through the hook.
 function ProfileActions() {
   const navigation = useNavigation<RootParamList>();
   return (
@@ -39,7 +109,10 @@ function ProfileActions() {
       <Button
         title="Push another profile"
         onPress={() =>
-          navigation.navigate('Profile', { userId: String(Math.random()) })
+          navigation.navigate('Profile', {
+            userId: String(Math.random()),
+            name: 'jayant',
+          })
         }
       />
       <Button title="Go back" onPress={() => navigation.goBack()} />
@@ -48,8 +121,57 @@ function ProfileActions() {
   );
 }
 
+function PillTabBar({ items, jumpTo }: TabBarProps<TabName>) {
+  return (
+    <View style={styles.pillBar}>
+      {items.map((item) => (
+        <Pressable
+          key={item.name}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: item.focused }}
+          onPress={() => jumpTo(item.name)}
+          style={[styles.pill, item.focused && styles.pillActive]}
+        >
+          {item.icon?.({
+            focused: item.focused,
+            color: item.focused ? '#ffffff' : '#c7c7cc',
+            size: 18,
+          })}
+          {item.focused && <Text style={styles.pillLabel}>{item.label}</Text>}
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
+function MainTabs() {
+  const { enabled } = useContext(CustomBarContext);
+  return (
+    <BottomTabs<TabName>
+      tabs={{
+        // Outlined icon normally, filled while the tab is active.
+        Home: {
+          screen: Home,
+          icon: svgIcon('homeOutlined'),
+          focusedIcon: svgIcon('home'),
+        },
+        Search: { screen: Search, icon: svgIcon('search') },
+        Settings: { screen: Settings, icon: svgIcon('settings') },
+      }}
+      tabBar={enabled ? PillTabBar : undefined}
+    />
+  );
+}
+
 export default function App() {
-  return <AppNavigation<RootParamList> screens={{ Home, Profile }} />;
+  const [enabled, setEnabled] = useState(false);
+  return (
+    <CustomBarContext.Provider value={{ enabled, setEnabled }}>
+      <AppNavigation<RootParamList>
+        screens={{ Welcome, Main: MainTabs, Profile }}
+      />
+    </CustomBarContext.Provider>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -69,5 +191,34 @@ const styles = StyleSheet.create({
   },
   actions: {
     gap: 8,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  pillBar: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    margin: 16,
+    padding: 6,
+    gap: 6,
+    borderRadius: 32,
+    backgroundColor: '#1c1c1e',
+  },
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 26,
+  },
+  pillActive: {
+    backgroundColor: '#3a3a3c',
+  },
+  pillLabel: {
+    color: '#ffffff',
+    fontWeight: '600',
   },
 });
